@@ -40,7 +40,7 @@ pytest --send-email --email-receivers=abc@gmail.com,abc@hotmail.com
 ```
 [pytest]
 addopts = --send-email --html=report.html
-email_receivers = superhin@126.com,hanzhichao@secoo.com
+email_receivers = superhin@126.com
 email_subject = Pytest Test Report
 email_attachments=test_a.py,report.html
 ```
