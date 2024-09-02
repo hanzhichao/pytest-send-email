@@ -1,10 +1,10 @@
-# pytest-send-eemail
+# pytest-send-email
 
 
 Plugin to send email after pytest execution with results.
 
-[![PyPI version](https://badge.fury.io/py/pytest-email.svg)](https://badge.fury.io/py/pytest-email)
-[![Downloads](https://pepy.tech/badge/pytest-email)](https://pepy.tech/project/pytest-email)
+[![PyPI version](https://badge.fury.io/py/pytest-send-email.svg)](https://badge.fury.io/py/pytest-send-email)
+[![Downloads](https://pepy.tech/badge/pytest-send-email)](https://pepy.tech/project/pytest-send-email)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)]()
 [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)]()
 [![Open Source Love png1](https://badges.frapsoft.com/os/v1/open-source.png?v=103)]()
@@ -28,9 +28,9 @@ Plugin to send email after pytest execution with results.
 python setup.py install
 ```
 
-> Case 2: Install from git (changes in master)
+> Case 2: Install from Pypi
 ```
-pip install git+https://github.com/hanzhichao/pytest-send-email
+pip install pytest-send-email
 ```
 
 2. Execute test's normally using options
@@ -54,10 +54,41 @@ You can also config email receivers, subject, body and smtp info in pytest.ini
 ```
 [pytest]
 addopts = --send-email --html=report.html
-email_receivers = superhin@126.com,hanzhichao@secoo.com
-email_subject = Pytest Report
+
+smtp_host = <smtp-server>
+smtp_port = <smtp-port>
+smtp_user = <your-email-user>
+smtp_pwd = <your-password or token>
+smtp_ssl = False
+
+
+email_receivers = superhin@126.com
+email_subject = Pytest Test Report
+email_body = 
+    Hi, this is the test report
 email_attachments=test_a.py,report.html
 ```
+
+Or you can config in pytest.ini with `[email]` section
+
+```ini
+addopts = --send-email --html=report.html
+
+[email]
+host = <smtp-server>
+port = <smtp-port>
+user = <your-email-user>
+password = <your-password or token>
+ssl = False
+
+receivers = superhin@126.com
+subject = Pytest Test Report
+body = 
+    Hi, this is the test report
+attachments=test_a.py,report.html
+
+```
+
 
 Email options:
 - --send-email: Send email when --send-email
@@ -110,7 +141,7 @@ Future: Failed test information
 
 ---
 
-*Thanks for using pytest-email!*
+*Thanks for using pytest-send-email!*
 
 If you have any questions / suggestions / comments on this, please feel free to reach me at
 

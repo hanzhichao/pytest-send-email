@@ -1,5 +1,6 @@
 import os
 import smtplib
+from configparser import ConfigParser
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import logging
@@ -148,17 +149,46 @@ def pytest_terminal_summary(terminalreporter, config):
     total = passed + failed + skipped + error + xfailed + xpassed
 
     if config.getoption("--send-email") is True:
-        smtp_host = config.getoption('--smtp-host') or config.getini('smtp_host')
-        smtp_port = config.getoption('--smtp-port') or config.getini('smtp_port')
-        smtp_user = config.getoption('--smtp-user') or config.getini('smtp_user')
-        smtp_pwd = config.getoption('--smtp-pwd') or config.getini('smtp_pwd')
-        smtp_ssl = config.getoption('--smtp-ssl') or config.getini('smtp_ssl')
+        ini = ConfigParser(allow_no_value=True)
+        ini.read(config.inifile)
 
-        subject = config.getoption('--email-subject') or config.getini('email_subject') or DEFAULT_EMAIL_SUBJECT
-        receivers = config.getoption('--email-receivers') or config.getini('email_receivers')
+        smtp_host = smtp_port = smtp_user = smtp_pwd = smtp_ssl = None
+        email_subject = email_receivers = email_body = email_template = email_attachments = None
+        if ini.has_section('email'):
+            if ini.has_option('email', 'host'):
+                smtp_host = ini.get('email', 'host')
+            if ini.has_option('email', 'port'):
+                smtp_port = ini.get('email', 'port')
+            if ini.has_option('email', 'user'):
+                smtp_user = ini.get('email', 'user')
+            if ini.has_option('email', 'pwd'):
+                smtp_pwd = ini.get('email', 'pwd')
+            if ini.has_option('email', 'ssl'):
+                smtp_ssl = ini.get('email', 'ssl')
+            if ini.has_option('email', 'subject'):
+                email_subject = ini.get('email', 'subject')
+            if ini.has_option('email', 'receivers'):
+                email_receivers = ini.get('email', 'receivers')
+            if ini.has_option('email', 'body'):
+                email_body = ini.get('email', 'body')
+            if ini.has_option('email', 'template'):
+                email_template = ini.get('email', 'template')
+            if ini.has_option('email', 'attachments'):
+                email_attachments = ini.get('email', 'attachments')
 
-        body = config.getoption('--email-body') or config.getini('email_body') or DEFAULT_EMAIL_BODY_TPL
-        template = config.getoption('--email-template') or config.getini('email_template')
+        smtp_host = config.getoption('--smtp-host') or config.getini('smtp_host') or smtp_host
+        smtp_port = config.getoption('--smtp-port') or config.getini('smtp_port') or smtp_port
+        smtp_user = config.getoption('--smtp-user') or config.getini('smtp_user') or smtp_user
+        smtp_pwd = config.getoption('--smtp-pwd') or config.getini('smtp_pwd') or smtp_pwd
+        smtp_ssl = config.getoption('--smtp-ssl') or config.getini('smtp_ssl') or smtp_ssl
+
+        subject = config.getoption('--email-subject') or config.getini(
+            'email_subject') or email_subject or DEFAULT_EMAIL_SUBJECT
+        receivers = config.getoption('--email-receivers') or config.getini('email_receivers') or email_receivers
+
+        body = config.getoption('--email-body') or config.getini('email_body') or email_body or DEFAULT_EMAIL_BODY_TPL
+        template = config.getoption('--email-template') or config.getini('email_template') or email_template
+
         if template and isinstance(template, str) and os.path.isfile(template):
             try:
                 with open(template, encoding='utf-8') as f:
@@ -167,7 +197,7 @@ def pytest_terminal_summary(terminalreporter, config):
                 logging.exception(ex)
         body = body % (subject, total, passed, failed, skipped, error, xpassed, xfailed)
 
-        attachments = config.getoption('--email-attachments') or config.getini('email_attachments')
+        attachments = config.getoption('--email-attachments') or config.getini('email_attachments') or email_attachments
 
         if receivers:
             receivers = receivers.split(',')
